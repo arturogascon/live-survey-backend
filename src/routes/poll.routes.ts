@@ -15,7 +15,7 @@ router.post("/", authMiddleware, createPoll);
 
 router.get("/", authMiddleware, getPolls);
 
-router.get("/:id", authMiddleware, getPollById);
+router.get("/:id", getPollById);
 
 router.patch("/:id", authMiddleware, updatePoll);
 
