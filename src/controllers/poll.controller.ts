@@ -90,10 +90,18 @@ export const getPolls = async (req: AuthRequest, res: Response) => {
 
 export const getPollById = async (req: Request, res: Response) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid poll ID" });
+    }
+
     const poll = await Poll.findById(req.params.id);
+
     if (!poll) {
       return res.status(404).json({ message: "Poll not found" });
     }
+
+    poll.options.sort((a, b) => b.votes - a.votes);
+
     res.json(poll);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
