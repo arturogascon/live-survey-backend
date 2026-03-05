@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createPoll,
+  deletePoll,
   getPollById,
   getPolls,
   updatePoll,
@@ -18,6 +19,8 @@ router.get("/", authMiddleware, getPolls);
 router.get("/:id", getPollById);
 
 router.patch("/:id", authMiddleware, updatePoll);
+
+router.delete("/:id", authMiddleware, deletePoll);
 
 router.post("/:id/vote/:optionId", voteLimiter, votePoll);
 

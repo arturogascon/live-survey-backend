@@ -77,6 +77,33 @@ export const updatePoll = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const deletePoll = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid poll ID" });
+    }
+
+    const poll = await Poll.findById(req.params.id);
+
+    if (!poll) {
+      return res.status(404).json({ message: "Poll not found" });
+    }
+
+    const isSameAuthor = poll.createdBy.toString() === req.userId;
+
+    if (!isSameAuthor) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized: You can only delete your own polls" });
+    }
+
+    await Poll.deleteOne({ _id: req.params.id });
+    return res.status(200).json({ message: "Poll deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const getPolls = async (req: AuthRequest, res: Response) => {
   try {
     const polls = await Poll.find({ createdBy: req.userId }).sort({
@@ -99,8 +126,6 @@ export const getPollById = async (req: Request, res: Response) => {
     if (!poll) {
       return res.status(404).json({ message: "Poll not found" });
     }
-
-    poll.options.sort((a, b) => b.votes - a.votes);
 
     res.json(poll);
   } catch (error) {
